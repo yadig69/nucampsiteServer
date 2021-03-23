@@ -1,36 +1,42 @@
 const express = require("express");
 const Partner = require("../models/partner");
+const authenticate = require("../authenticate");
 
 const partnersRouter = express.Router();
+
 partnersRouter
   .route("/")
   .get((req, res, next) => {
     Partner.find()
       .then((partners) => {
-        res.end("Will send all the partners to you");
+        res.statusCode = 200;
         res.setHeader("Content-Type", "application/json");
         res.json(partners);
       })
       .catch((err) => next(err));
   })
-  .post((req, res, next) => {
+  .post(authenticate.verifyUser, (req, res, next) => {
     Partner.create(req.body)
       .then((partner) => {
-        res.end(
-          `Will add the partner: ${req.body.name} with description: ${req.body.description}`
-        );
+        console.log("Partner Created ", partner);
         res.statusCode = 200;
         res.setHeader("Content-Type", "application/json");
         res.json(partner);
       })
       .catch((err) => next(err));
   })
-  .put((req, res) => {
+  .put(authenticate.verifyUser, (req, res) => {
     res.statusCode = 403;
     res.end("PUT operation not supported on /partners");
   })
-  .delete((req, res) => {
-    res.end("Deleting all partners");
+  .delete(authenticate.verifyUser, (req, res, next) => {
+    Partner.deleteMany()
+      .then((response) => {
+        res.statusCode = 200;
+        res.setHeader("Content-Type", "application/json");
+        res.json(response);
+      })
+      .catch((err) => next(err));
   });
 // partnersId router
 partnersRouter
@@ -40,37 +46,38 @@ partnersRouter
       .then((partners) => {
         res.statusCode = 200;
         res.setHeader("Content-Type", "text/plain");
-        next();
-        res.end(
-          `Will send details of the partners: ${req.params.partnersId} to you`
-        );
+        res.json(partner);
       })
       .catch((err) => next(err));
   })
-  .post((req, res) => {
+  .post(authenticate.verifyUser, (req, res) => {
     res.statusCode = 403;
     res.end(
       `POST operation not supported on /partners/${req.params.partnersId}`
     );
   })
-  .put((req, res) => {
-    Partner.findByIdAndUpdate(req.params.partnersId)
+  .put(authenticate.verifyUser, (req, res, next) => {
+    Partner.findByIdAndUpdate(
+      req.params.partnersId,
+      {
+        $set: req.body,
+      },
+      { new: true }
+    )
       .then((partners) => {
-        res.write(`Updating the partners: ${req.params.partnersId}`);
-        res.end(
-          `Will update the partners: ${req.body.name} with description: ${rea.body.description}`
-        );
+        res.statusCode = 200;
+        res.setHeader("Content-Type", "application/json");
+        res.json(partner);
       })
       .catch((err) => next(err));
   })
 
-  .delete((req, res) => {
+  .delete(authenticate.verifyUser, (req, res, next) => {
     Partners.findByIdAndDelete(req.params.partnersId)
       .then((response) => {
         res.statusCode = 200;
         res.setHeader("Content-Type", "application/json");
         res.json(response);
-        res.end(`Deleting partners: ${req.params.partnersId}`);
       })
       .catch((err) => next(err));
   });
