@@ -34,4 +34,16 @@ exports.jwtPassport = passport.use(
   })
 );
 
+// const verifyAdmin = express.Router();
+
+// exports.verifyAdmin = (req, res, next) => {
+
+// }
+
 exports.verifyUser = passport.authenticate("jwt", { session: false });
+
+// if (admin) {
+//     return next();
+// } else {
+//     return
+// }
