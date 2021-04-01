@@ -4,6 +4,7 @@ const User = require("./models/user");
 const JwtStrategy = require("passport-jwt").Strategy;
 const ExtractJwt = require("passport-jwt").ExtractJwt;
 const jwt = require("jsonwebtoken");
+const verifyAdmin = require("verifyAdmin");
 
 const config = require("./config.js");
 
@@ -34,16 +35,16 @@ exports.jwtPassport = passport.use(
   })
 );
 
-// const verifyAdmin = express.Router();
-
-// exports.verifyAdmin = (req, res, next) => {
-
-// }
+exports.verifyAdmin = (req, res, next) => {
+  console.log("req.user.admin");
+  if (verifyAdmin === true) {
+    req.user.admin();
+    return next();
+  } else {
+    const err = new Error("You are not authorized to perform this operation!");
+    err.status = 403;
+    return next(err);
+  }
+};
 
 exports.verifyUser = passport.authenticate("jwt", { session: false });
-
-// if (admin) {
-//     return next();
-// } else {
-//     return
-// }
