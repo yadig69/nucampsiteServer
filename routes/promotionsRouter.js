@@ -14,7 +14,7 @@ promotionsRouter
       })
       .catch((err) => next(err));
   })
-  .post(authenticate.verifyUser, (req, res, next) => {
+  .post(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
     Promotions.create(req.body)
       .then((promotion) => {
         console.log("Promotions Created ", promotion);
@@ -28,15 +28,19 @@ promotionsRouter
     res.statusCode = 403;
     res.end("PUT operation not supported on /promotion");
   })
-  .delete(authenticate.verifyUser, (req, res, next) => {
-    Promotions.deleteMany()
-      .then((response) => {
-        res.statusCode = 200;
-        res.setHeader("Content-Type", "application/json");
-        res.json(response);
-      })
-      .catch((err) => next(err));
-  });
+  .delete(
+    authenticate.verifyUser,
+    authenticate.verifyAdmin,
+    (req, res, next) => {
+      Promotions.deleteMany()
+        .then((response) => {
+          res.statusCode = 200;
+          res.setHeader("Content-Type", "application/json");
+          res.json(response);
+        })
+        .catch((err) => next(err));
+    }
+  );
 /////////////////////
 promotionsRouter
   .route("/:promotionsId")
@@ -55,7 +59,7 @@ promotionsRouter
       `POST operation not supported on /promotion/${req.params.promotionsId}`
     );
   })
-  .put(authenticate.verifyUser, (req, res, next) => {
+  .put(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
     Promotions.findByIdAndUpdate(
       req.params.promotionsId,
       {
@@ -71,15 +75,19 @@ promotionsRouter
       .catch((err) => next(err));
   })
 
-  .delete(authenticate.verifyUser, (req, res, next) => {
-    Promotions.findByIdAndDelete(req.params.promotionsId)
-      .then((Promotions) => {
-        res.statusCode = 200;
-        res.setHeader("Content-Type", "application/json");
-        res.json(response);
-      })
-      .catch((err) => next(err));
-  });
+  .delete(
+    authenticate.verifyUser,
+    authenticate.verifyAdmin,
+    (req, res, next) => {
+      Promotions.findByIdAndDelete(req.params.promotionsId)
+        .then((Promotions) => {
+          res.statusCode = 200;
+          res.setHeader("Content-Type", "application/json");
+          res.json(response);
+        })
+        .catch((err) => next(err));
+    }
+  );
 //////////////
 
 module.exports = promotionsRouter;
