@@ -19,10 +19,6 @@ const promotionsSchema = new Schema(
       type: String,
       required: true,
     },
-    elevation: {
-      type: Number,
-      required: true,
-    },
     cost: {
       type: Currency,
       required: true,
